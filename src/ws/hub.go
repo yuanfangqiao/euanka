@@ -15,6 +15,7 @@ import (
 const (
 	SENDER_ASR = 100
 	SENDER_DM  = 200
+	SENDER_LLM = 201
 	SENDER_TTS = 300
 )
 
@@ -42,8 +43,11 @@ type Hub struct {
 	// asr
 	asr *AsrClient
 
-	// tts
+	// llm
+	llm *LlmClient
 
+	// tts
+	tts *TtsClient
 }
 
 func newHub() *Hub {
@@ -58,6 +62,9 @@ func newHub() *Hub {
 func (h *Hub) run() {
 	var asrIng string
 	var asrResult string
+
+	var nlg string
+
 	for {
 		select {
 		case client := <-h.register:
@@ -128,37 +135,74 @@ func (h *Hub) run() {
 
 						json.Unmarshal(resMsg, &rasaRes)
 
-						var ttsReq = "{\"text\":\"" + rasaRes[0].Text + "\",\"spk_id\":0,\"speed\":1.0,\"volume\":1.0,\"sample_rate\":16000}"
-						ttsResp, ttsErr := http.Post("http://10.4.0.1:8090/paddlespeech/tts", "application/json", strings.NewReader(ttsReq))
-						if ttsErr != nil {
-							log.Fatal("tts post fail, err:", err)
-						}
-						defer ttsResp.Body.Close()
-						ttsResStr, _ := ioutil.ReadAll(ttsResp.Body)
-						log.Printf("tts req:%s, res:%s", ttsReq, ttsResStr)
-						var ttsData data.PaddlespeechData
-						json.Unmarshal(ttsResStr, &ttsData)
+						nlg = rasaRes[0].Text
 
-						// 下发消息给到终端
-						dm := data.DmData{
-							Topic: data.TOPIC_DM_RESULT,
-							DM: data.DmItem{
-								Nlg:         rasaRes[0].Text,
-								AudioBase64: ttsData.Result.Audio,
-							},
-						}
+						// 送LLM 人设对话
+						h.llm.send(nlg, asrResult)
 
-						dmRes, _ := json.Marshal(dm)
-						//log.Print("SENDER DM")
-						for client := range h.clients {
-							select {
-							// 下发给到终端,Todo 修改终端端点
-							case client.send <- []byte(dmRes):
-							default:
-								close(client.send)
-								delete(h.clients, client)
-							}
-						}
+						// 直接播报TTS
+						// h.tts.send(nlg)
+
+						// var ttsReq = "{\"text\":\"" + rasaRes[0].Text + "\",\"spk_id\":0,\"speed\":1.0,\"volume\":1.0,\"sample_rate\":16000}"
+						// ttsResp, ttsErr := http.Post("http://10.4.0.1:8090/paddlespeech/tts", "application/json", strings.NewReader(ttsReq))
+						// if ttsErr != nil {
+						// 	log.Fatal("tts post fail, err:", err)
+						// }
+						// defer ttsResp.Body.Close()
+						// ttsResStr, _ := ioutil.ReadAll(ttsResp.Body)
+						// log.Printf("tts req:%s, res:%s", ttsReq, ttsResStr)
+						// var ttsData data.PaddlespeechData
+						// json.Unmarshal(ttsResStr, &ttsData)
+
+						// // 下发消息给到终端
+						// dm := data.DmData{
+						// 	Topic: data.TOPIC_DM_RESULT,
+						// 	DM: data.DmItem{
+						// 		Nlg:         rasaRes[0].Text,
+						// 		AudioBase64: ttsData.Result.Audio,
+						// 	},
+						// }
+
+						// dmRes, _ := json.Marshal(dm)
+						// //log.Print("SENDER DM")
+						// for client := range h.clients {
+						// 	select {
+						// 	// 下发给到终端,Todo 修改终端端点
+						// 	case client.send <- []byte(dmRes):
+						// 	default:
+						// 		close(client.send)
+						// 		delete(h.clients, client)
+						// 	}
+						// }
+
+					}
+				}
+			case SENDER_LLM:
+				nlgSentence := string(broadcast.data)
+				log.Println("llm to tts:", string(nlgSentence))
+				h.tts.send(string(nlgSentence))
+			case SENDER_TTS:
+				audioUrl := string(broadcast.data)
+
+				// 下发消息给到终端
+				dm := data.DmData{
+					Topic: data.TOPIC_DM_RESULT,
+					DM: data.DmItem{
+						Nlg:         nlg,
+						AudioBase64: "",
+						AudioUrl:    audioUrl,
+					},
+				}
+
+				dmRes, _ := json.Marshal(dm)
+				//log.Print("SENDER DM")
+				for client := range h.clients {
+					select {
+					// 下发给到终端,Todo 修改终端端点
+					case client.send <- []byte(dmRes):
+					default:
+						close(client.send)
+						delete(h.clients, client)
 					}
 				}
 			}

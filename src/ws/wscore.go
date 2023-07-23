@@ -44,6 +44,12 @@ func SetUpHub() *Hub {
 	asr := newAsr(hub)
 	hub.asr = asr
 
+	llm := newLlm(hub)
+	hub.llm = llm
+
+	tts := newTts(hub)
+	hub.tts = tts
+
 	go hub.run()
 	return hub
 }

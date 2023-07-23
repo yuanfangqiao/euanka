@@ -8,4 +8,5 @@ type DmData struct {
 type DmItem struct {
 	Nlg         string `json:"nlg"`
 	AudioBase64 string `json:"audioBase64"`
+	AudioUrl    string `json:"audioUrl"`
 }
