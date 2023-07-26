@@ -1,8 +1,18 @@
 
 ## 介绍
-这是一个即将起步的AI对话服务体系，当然当前都是构思完善中....
+
+
+这是一个即将起步的AI对话服务体系，当然当前都是构思完善中，如果有人喜欢会继续更新...
+
+
+![](.assets/architecture.drawio.png)
+
+[![](.assets/cover.jpg)](https://www.bilibili.com/video/BV12c411c7sz?t=47.7)
+
 
 ### 依赖项目
+
+感谢以下项目的支撑！
 
 #### 客户端
 树莓派 语音终端（GO实现） https://github.com/yuanfangqiao/euanka-client.git
