@@ -7,7 +7,7 @@
 
 ![](.assets/architecture.drawio.png)
 
-[![](.assets/cover.jpg)](https://www.bilibili.com/video/BV12c411c7sz?t=47.7)
+[![](.assets/cover-2.jpg)](https://www.bilibili.com/video/BV12c411c7sz?t=47.7)
 
 
 ### 依赖项目
