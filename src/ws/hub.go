@@ -1,15 +1,20 @@
 package ws
 
 import (
+	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/websocket"
-
+	"go.uber.org/zap"
+	"github.com/yalp/jsonpath"
 	"eureka/src/data"
+	"eureka/src/global"
 )
 
 const (
@@ -64,6 +69,7 @@ func (h *Hub) run() {
 	var asrResult string
 
 	var nlg string
+	var nlgSentence string
 
 	for {
 		select {
@@ -83,7 +89,18 @@ func (h *Hub) run() {
 			switch broadcast.sender {
 			case UID_UPLOADER:
 				// 音频数据发给ASR服务
-				h.asr.conn.WriteMessage(broadcast.msgType, broadcast.data)
+
+				// k2 使用float32
+				var res []byte
+				if broadcast.msgType == websocket.BinaryMessage {
+					res = converPcm16ToFloat32(broadcast.data)
+				} else {
+					global.LOG.Info("asr upload text:", zap.String("text", string(broadcast.data)))
+					res = broadcast.data
+				}
+
+				//h.wsClient.conn.WriteMessage(websocket.BinaryMessage, res)
+				h.asr.conn.WriteMessage(broadcast.msgType, res)
 			case SENDER_ASR:
 				// 识别结果
 				if broadcast.msgType == websocket.TextMessage {
@@ -122,8 +139,13 @@ func (h *Hub) run() {
 
 					if asrResult != "" {
 						var dmReq = "{\"message\":\"" + asrResult + "\"}"
+
+						rasaHost := global.CONFIG.Service.Rasa
+
+						global.LOG.Info("rasa service", zap.String("rasaHost", rasaHost))
+
 						// 请求NLP DM
-						resp, err := http.Post("http://10.4.0.1:5005/webhooks/rest/webhook", "application/json", strings.NewReader(dmReq))
+						resp, err := http.Post("http://"+rasaHost+":5005/webhooks/rest/webhook", "application/json", strings.NewReader(dmReq))
 						if err != nil {
 							log.Fatal("post dm fail, err:", err)
 						}
@@ -178,11 +200,23 @@ func (h *Hub) run() {
 					}
 				}
 			case SENDER_LLM:
-				nlgSentence := string(broadcast.data)
+				nlgSentence = string(broadcast.data)
 				log.Println("llm to tts:", string(nlgSentence))
 				h.tts.send(string(nlgSentence))
 			case SENDER_TTS:
-				audioUrl := string(broadcast.data)
+				// audioUrl := string(broadcast.data)
+
+				// ttsRes := string(broadcast.data)
+
+				var ttsResJ interface{}
+				json.Unmarshal(broadcast.data, &ttsResJ)
+
+				nlgT, _ := jsonpath.Read(ttsResJ, "$.nlg")
+				var nlg = nlgT.(string)
+
+				audioUrlT, _ := jsonpath.Read(ttsResJ, "$.audioUrl")
+				var audioUrl = audioUrlT.(string)
+				
 
 				// 下发消息给到终端
 				dm := data.DmData{
@@ -208,4 +242,45 @@ func (h *Hub) run() {
 			}
 		}
 	}
+}
+
+// 将pcm16int 转 float32 , k2需要
+func converPcm16ToFloat32(pcmI16 []byte) []byte {
+
+	res := make([]byte, 0)
+	end := 0
+	for i := 0; i < len(pcmI16); {
+		if i+2 < len(pcmI16) {
+			end = i + 2
+		} else {
+			end = len(pcmI16)
+		}
+
+		//itemInt16 := binary.LittleEndian.int16(before[i:end])
+
+		//itemInt16 := int(binary.LittleEndian.Uint16(before[i:end]))
+
+		binBuf := bytes.NewBuffer(pcmI16[i:end])
+
+		var x int16
+		binary.Read(binBuf, binary.LittleEndian, &x)
+
+		//fmt.Printf("-%X", x)
+
+		itemFloat32 := float32(x) / 32768
+
+		b := Float32ToByte(itemFloat32)
+
+		res = append(res, b...)
+
+		i += 2
+	}
+	return res
+}
+
+func Float32ToByte(float float32) []byte {
+	bits := math.Float32bits(float)
+	bytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(bytes, bits)
+	return bytes
 }

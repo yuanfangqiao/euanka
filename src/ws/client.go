@@ -60,6 +60,7 @@ func (c *Client) readPump() {
 			message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 			var text = string(message)
 			log.Print("rev text:" + text)
+			
 
 			// broadcast message to hub
 			c.hub.broadcast <- &Broadcast{data: message, sender: c.sender}

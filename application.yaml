@@ -1,0 +1,26 @@
+app: # 基本配置信息
+  env: local # 环境
+  port: 8889 # 服务监听端口
+  app_name: euanka # 应用名称
+  app_url: http://localhost # 应用域名
+  db_type: mysql # 使用的数据库
+  # 外部访问
+  external_tts_host_port: ${APP_EXTERNAL_TTS_HOST_PORT} 
+
+service:
+  asr: ${SERVICE_ASR}
+  rasa: ${SERVICE_RASA}
+  llm: ${SERVICE_LLM}
+  tts: ${SERVICE_TTS}
+  
+zap: # 日志配置
+  level: info # 日志级别
+  prefix: '' # 日志前缀
+  format: console # 输出
+  director: log # 日志存放的文件
+  encode_level: CapitalColorLevelEncoder # 编码级别
+  stacktrace_key: stacktrace # 栈名
+  max_age: 0 # 日志留存时间
+  show_line: true # 显示行
+  log_in_console: true # 输出控制台
+

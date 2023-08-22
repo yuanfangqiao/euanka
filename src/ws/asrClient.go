@@ -1,10 +1,11 @@
 package ws
 
 import (
+	"eureka/src/global"
 	"log"
 	"net/url"
-
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 )
 
 type AsrClient struct {
@@ -14,7 +15,9 @@ type AsrClient struct {
 
 func newAsr(h *Hub) *AsrClient {
 	// asr
-	u := url.URL{Scheme: "ws", Host: "10.4.0.1:6006", Path: ""}
+	asrHost := global.CONFIG.Service.Asr
+	global.LOG.Info("asr service", zap.String("asr",asrHost))
+	u := url.URL{Scheme: "ws", Host: asrHost + ":6006", Path: ""}
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	log.Printf("asr connecting to %s", u.String())
 	if err != nil {

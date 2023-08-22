@@ -2,12 +2,14 @@ package ws
 
 import (
 	"encoding/json"
+	"eureka/src/global"
 	"log"
 	"net/url"
 	"strings"
 
 	"github.com/gorilla/websocket"
 	"github.com/yalp/jsonpath"
+	"go.uber.org/zap"
 )
 
 const (
@@ -24,7 +26,10 @@ type LlmClient struct {
 
 func newLlm(h *Hub) *LlmClient {
 
-	u := url.URL{Scheme: "ws", Host: LLM_HOST_PORT, Path: ""}
+	llmHost  := global.CONFIG.Service.Llm;
+	global.LOG.Info("llm service", zap.String("llmHost",llmHost))
+
+	u := url.URL{Scheme: "ws", Host: llmHost + ":7600", Path: ""}
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	log.Printf("llm connecting to %s", u.String())
