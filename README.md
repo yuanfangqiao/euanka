@@ -15,13 +15,14 @@
 ![euanka-web](./.assets/euanka-web.png)
 
 #### 使用树莓派 4麦克风阵列 定制唤醒交互
+
 视频如下： 
+
 [![](.assets/cover-2.jpg)](https://www.bilibili.com/video/BV12c411c7sz?t=47.7)
 
 ### 环境
 
 当前构建的版本都是 x86架构，i5 8gen 4核32G，可以缓慢运行 
-
 
 ### 构建
 #### 本地构建
