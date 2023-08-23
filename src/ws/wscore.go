@@ -56,7 +56,7 @@ func SetUpHub() *Hub {
 
 func SetUploader(serverMux *http.ServeMux, hub *Hub) {
 	log.Printf("set upload")
-	serverMux.HandleFunc("/camera/uploader/ws", func(w http.ResponseWriter, r *http.Request) {
+	serverMux.HandleFunc("/ws/chat", func(w http.ResponseWriter, r *http.Request) {
 		uploaderWs(w, r, hub)
 	})
 }
