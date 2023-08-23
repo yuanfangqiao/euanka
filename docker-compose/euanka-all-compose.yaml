@@ -69,15 +69,28 @@ services:
       - llm
       - tts
     environment:
-      # docker 原本打算使用docker内部域名，但是，我的电脑分配内部网络非常慢
+      # docker 原本打算使用docker内部域名，但是，我的电脑分配内部网络非常慢，使用当前的部署宿主机IP
       SERVICE_ASR: "192.168.1.16"
       SERVICE_RASA: "192.168.1.16"
       SERVICE_LLM: "192.168.1.16"
       SERVICE_TTS: "192.168.1.16"
-      # 对外访问的TTS服务地址，需要修改
+      # 对外访问的TTS服务地址，需要修改，仍是主机的IP
       APP_EXTERNAL_TTS_HOST_PORT: "192.168.1.16:7860"
     ports:
       - "8080:8080/tcp"
+    networks:
+      - euanka
+
+  euanka-web:
+    image: "registry.cn-shenzhen.aliyuncs.com/yuanfangqiao/euanka-web:0.1"
+    restart: always
+    depends_on:
+      - euanka
+    environment:
+      # web服务访问的基础地址，需要修改，主机IP的websocket地址
+      VUE_APP_API_BASE_URL: "ws://192.168.1.16:8080/ws/chat"
+    ports:
+      - "80:80/tcp"
     networks:
       - euanka
 
