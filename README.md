@@ -1,4 +1,5 @@
-
+本地完全部署自己的大模型语音对话角色
+---
 ### 介绍
 
 这是一个即将起步的AI对话服务体系，当然当前都是构思完善中，如果有人喜欢会继续更新...
@@ -75,11 +76,13 @@ docker-compose_tts_1             python3 -u app.py                Up      0.0.0.
 
 **需要以下所有项目支持，并且全部实现docker构建运行。**
 
+**必须以下我重新开发的项目支持，运行已经按照一定请求协议格式交互运行**
+
 项目可做学习参考使用。
 
 - [树莓派 语音终端 Snowboy唤醒 GO实现]( https://github.com/yuanfangqiao/euanka-client.git)
 
-- [网页对话 Vue实现]( https://github.com/yuanfangqiao/euanka-client.git)
+- [网页对话 Vue实现]( https://github.com/yuanfangqiao/euanka-web.git)
 
 - [流式识别 ASR K2]( https://github.com/yuanfangqiao/sherpa-onnx-euanka.git)
 
