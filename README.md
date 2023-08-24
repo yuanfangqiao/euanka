@@ -15,11 +15,14 @@
 ![](.assets/architecture.drawio.png)
 
 #### 使用 euanka-web 前端效果
-![euanka-web](./.assets/euanka-web.png)
+
+点击图片打开视频
+
+[![euanka-web](.assets/euanka-web.png)](https://www.bilibili.com/video/BV1kr4y1R7rL?t=15.0)
 
 #### 使用树莓派 4麦克风阵列 定制唤醒交互
 
-视频如下： 
+点击图片打开视频
 
 [![](.assets/cover-2.jpg)](https://www.bilibili.com/video/BV12c411c7sz?t=47.7)
 
