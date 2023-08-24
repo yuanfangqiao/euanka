@@ -80,9 +80,10 @@ docker-compose_tts_1             python3 -u app.py                Up      0.0.0.
 
 项目可做学习参考使用。
 
+- [网页对话 Vue实现]( https://github.com/yuanfangqiao/euanka-web.git)
+
 - [树莓派 语音终端 Snowboy唤醒 GO实现]( https://github.com/yuanfangqiao/euanka-client.git)
 
-- [网页对话 Vue实现]( https://github.com/yuanfangqiao/euanka-web.git)
 
 - [流式识别 ASR K2]( https://github.com/yuanfangqiao/sherpa-onnx-euanka.git)
 
