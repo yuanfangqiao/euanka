@@ -17,7 +17,7 @@ const (
 )
 
 var nlgSentenceArr []string
-var nlgArrIndex int 
+var nlgArrIndex int
 
 type LlmClient struct {
 	hub  *Hub
@@ -26,8 +26,8 @@ type LlmClient struct {
 
 func newLlm(h *Hub) *LlmClient {
 
-	llmHost  := global.CONFIG.Service.Llm;
-	global.LOG.Info("llm service", zap.String("llmHost",llmHost))
+	llmHost := global.CONFIG.Service.Llm
+	global.LOG.Info("llm service", zap.String("llmHost", llmHost))
 
 	u := url.URL{Scheme: "ws", Host: llmHost + ":7600", Path: ""}
 
@@ -96,15 +96,15 @@ func (llm *LlmClient) received(message []byte) {
 			panic(errMsg)
 		}
 		outputStr := output.(string)
-		seps := "：:，,。.？?！!～~\n"
+		seps := "：:。.？?！!～~\n"
 		nlgSentenceArr := strings.FieldsFunc(outputStr, func(r rune) bool {
 			return strings.ContainsRune(seps, r)
 		})
 		log.Println("nlgSentenceArr:", nlgSentenceArr)
 		log.Println("len:", len(nlgSentenceArr))
 
-		if len(nlgSentenceArr) >1 && len(nlgSentenceArr) > nlgArrIndex+1 {
-			nlgSentence  := nlgSentenceArr[nlgArrIndex]
+		if len(nlgSentenceArr) > 1 && len(nlgSentenceArr) > nlgArrIndex+1 {
+			nlgSentence := nlgSentenceArr[nlgArrIndex]
 			nlgArrIndex++
 			llm.hub.broadcast <- &Broadcast{msgType: websocket.TextMessage, data: []byte(nlgSentence), sender: SENDER_LLM}
 		}
@@ -117,14 +117,14 @@ func (llm *LlmClient) received(message []byte) {
 			panic(errMsg)
 		}
 		outputStr := output.(string)
-		seps := "：:，,。.？?！!～~\n"
+		seps := "：:。.？?！!～~\n"
 		nlgSentenceArr := strings.FieldsFunc(outputStr, func(r rune) bool {
 			return strings.ContainsRune(seps, r)
 		})
 		log.Println("nlgSentenceArr:", nlgSentenceArr)
 		log.Println("len:", len(nlgSentenceArr))
 
-		nlgSentence  := nlgSentenceArr[len(nlgSentenceArr)-1]
+		nlgSentence := nlgSentenceArr[len(nlgSentenceArr)-1]
 		llm.hub.broadcast <- &Broadcast{msgType: websocket.TextMessage, data: []byte(nlgSentence), sender: SENDER_LLM}
 	}
 

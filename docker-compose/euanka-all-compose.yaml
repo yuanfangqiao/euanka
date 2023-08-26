@@ -60,7 +60,7 @@ services:
       - euanka
 
   euanka:
-    image: "registry.cn-shenzhen.aliyuncs.com/yuanfangqiao/euanka:0.1"
+    image: "registry.cn-shenzhen.aliyuncs.com/yuanfangqiao/euanka:0.2"
     restart: always
     depends_on:
       - asr
@@ -82,7 +82,7 @@ services:
       - euanka
 
   euanka-web:
-    image: "registry.cn-shenzhen.aliyuncs.com/yuanfangqiao/euanka-web:0.1"
+    image: "registry.cn-shenzhen.aliyuncs.com/yuanfangqiao/euanka-web:0.3"
     restart: always
     depends_on:
       - euanka
