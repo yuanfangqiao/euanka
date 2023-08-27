@@ -27,7 +27,7 @@
 
 点击图片打开视频
 
-[![euanka-web](.assets/euanka-web.png)](https://www.bilibili.com/video/BV1kr4y1R7rL?t=15.0)
+[![euanka-web](.assets/euanka-web.png)](https://www.bilibili.com/video/BV1vu411N7Dk?t=234.0)
 
 #### 使用树莓派 4麦克风阵列 定制唤醒交互
 
